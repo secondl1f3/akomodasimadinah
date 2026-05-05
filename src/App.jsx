@@ -9,11 +9,12 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  ChevronDown
+  ChevronDown,
+  Calendar
 } from "lucide-react";
 import "./App.css";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFy2TXJFnZo4JtGVd1bjZ2NoXtoPtRDd6swSL2PrllnOvooy1s6SsUHf-CyrRuyLpe/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOSZLVZRbRkVnHfKlOkTFPOyttz8n2idTsKqcBjLhfkR0urdKYZFjAxamFDTdIGzHX/exec";
 
 const hotelBySektor = {
   "Sektor 1": [
@@ -144,7 +145,8 @@ const hotelBySektor = {
     { "id": "521", "name": "3 POINTA AL-KAWTHAR" },
     { "id": "522", "name": "TAJ WARD HOTEL" },
     { "id": "523", "name": "MANAZIL ALASWAF" },
-    { "id": "524", "name": "MANAZIL MADINAH" }
+    { "id": "524", "name": "MANAZIL MADINAH" },
+    { "id": "525", "name": "Rose Holiday 3" }
   ]
 };
 
@@ -154,6 +156,7 @@ function App() {
     sektor: "",
     hotel: "",
     jumlahJamaah: "",
+    tanggal: "",
     jam: ""
   });
 
@@ -187,9 +190,9 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { jenisFormulir, sektor, hotel, jumlahJamaah, jam } = formData;
+    const { jenisFormulir, sektor, hotel, jumlahJamaah, tanggal, jam } = formData;
 
-    if (!jenisFormulir || !sektor || !hotel || !jumlahJamaah || !jam) {
+    if (!jenisFormulir || !sektor || !hotel || !jumlahJamaah || !tanggal || !jam) {
       showToast("Mohon lengkapi semua data form.", "error");
       return;
     }
@@ -211,6 +214,7 @@ function App() {
         sektor: "",
         hotel: "",
         jumlahJamaah: "",
+        tanggal: "",
         jam: ""
       });
     } catch (error) {
@@ -313,8 +317,22 @@ function App() {
               </div>
 
               <div className="field">
+                <label>Tanggal</label>
+                <div className="input-wrapper">
+                  <Calendar className="field-icon" size={20} />
+                  <input
+                    type="date"
+                    name="tanggal"
+                    value={formData.tanggal}
+                    onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
+              </div>
+
+              <div className="field">
                 <label>
-                  {formData.jenisFormulir === "Pendorongan" ? "Jam Pendorongan" : "Jam Check-in"}
+                  {formData.jenisFormulir === "Pendorongan" ? "Jam Check-out" : "Jam Check-in"}
                 </label>
                 <div className="input-wrapper">
                   <Clock className="field-icon" size={20} />
@@ -323,6 +341,7 @@ function App() {
                     name="jam"
                     value={formData.jam}
                     onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   />
                 </div>
               </div>
