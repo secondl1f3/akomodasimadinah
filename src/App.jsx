@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Building2,
   MapPin,
@@ -13,8 +13,9 @@ import {
   Calendar
 } from "lucide-react";
 import "./App.css";
+import { kloterList } from "./kloterData";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOSZLVZRbRkVnHfKlOkTFPOyttz8n2idTsKqcBjLhfkR0urdKYZFjAxamFDTdIGzHX/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVtlA6E1IychGjtKAuAAU7dU4NHE_i6rieV9CQdxhVnSsl4cX0wB8t2o74f9PPikK9/exec";
 
 const hotelBySektor = {
   "Sektor 1": [
@@ -155,6 +156,7 @@ function App() {
     jenisFormulir: "",
     sektor: "",
     hotel: "",
+    kloter: "",
     jumlahJamaah: "",
     tanggal: "",
     jam: ""
@@ -162,6 +164,20 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  
+  const [kloterSearch, setKloterSearch] = useState("");
+  const [showKloterDropdown, setShowKloterDropdown] = useState(false);
+  const kloterRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (kloterRef.current && !kloterRef.current.contains(event.target)) {
+        setShowKloterDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (toast.show) {
@@ -190,9 +206,9 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { jenisFormulir, sektor, hotel, jumlahJamaah, tanggal, jam } = formData;
+    const { jenisFormulir, sektor, hotel, kloter, jumlahJamaah, tanggal, jam } = formData;
 
-    if (!jenisFormulir || !sektor || !hotel || !jumlahJamaah || !tanggal || !jam) {
+    if (!jenisFormulir || !sektor || !hotel || !kloter || !jumlahJamaah || !tanggal || !jam) {
       showToast("Mohon lengkapi semua data form.", "error");
       return;
     }
@@ -213,10 +229,12 @@ function App() {
         jenisFormulir: "",
         sektor: "",
         hotel: "",
+        kloter: "",
         jumlahJamaah: "",
         tanggal: "",
         jam: ""
       });
+      setKloterSearch("");
     } catch (error) {
       showToast("Koneksi gagal, silakan coba lagi.", "error");
     } finally {
@@ -260,6 +278,74 @@ function App() {
                     <option value="Pendorongan">Pendorongan</option>
                   </select>
                   <ChevronDown className="select-arrow" size={20} />
+                </div>
+              </div>
+
+              <div className="field">
+                <label>Tanggal</label>
+                <div className="input-wrapper">
+                  <Calendar className="field-icon" size={20} />
+                  <input
+                    type="date"
+                    name="tanggal"
+                    value={formData.tanggal}
+                    onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
+              </div>
+
+              <div className="field">
+                <label>
+                  {formData.jenisFormulir === "Pendorongan" ? "Jam Check-out" : "Jam Check-in"}
+                </label>
+                <div className="input-wrapper">
+                  <Clock className="field-icon" size={20} />
+                  <input
+                    type="time"
+                    name="jam"
+                    value={formData.jam}
+                    onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
+              </div>
+
+              <div className="field" ref={kloterRef}>
+                <label>Kloter</label>
+                <div className="input-wrapper">
+                  <MapPin className="field-icon" size={20} />
+                  <input
+                    type="text"
+                    name="kloter"
+                    value={kloterSearch}
+                    onChange={(e) => {
+                      setKloterSearch(e.target.value);
+                      setShowKloterDropdown(true);
+                      setFormData(prev => ({ ...prev, kloter: e.target.value }));
+                    }}
+                    onFocus={() => setShowKloterDropdown(true)}
+                    placeholder="Ketik atau pilih Kloter..."
+                    autoComplete="off"
+                  />
+                  {showKloterDropdown && (
+                    <ul className="custom-dropdown">
+                      {kloterList
+                        .filter(s => s.toLowerCase().includes(kloterSearch.toLowerCase()))
+                        .map((s) => (
+                          <li
+                            key={s}
+                            onClick={() => {
+                              setKloterSearch(s);
+                              setFormData(prev => ({ ...prev, kloter: s }));
+                              setShowKloterDropdown(false);
+                            }}
+                          >
+                            {s}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 
@@ -316,35 +402,7 @@ function App() {
                 </div>
               </div>
 
-              <div className="field">
-                <label>Tanggal</label>
-                <div className="input-wrapper">
-                  <Calendar className="field-icon" size={20} />
-                  <input
-                    type="date"
-                    name="tanggal"
-                    value={formData.tanggal}
-                    onChange={handleChange}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  />
-                </div>
-              </div>
 
-              <div className="field">
-                <label>
-                  {formData.jenisFormulir === "Pendorongan" ? "Jam Check-out" : "Jam Check-in"}
-                </label>
-                <div className="input-wrapper">
-                  <Clock className="field-icon" size={20} />
-                  <input
-                    type="time"
-                    name="jam"
-                    value={formData.jam}
-                    onChange={handleChange}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  />
-                </div>
-              </div>
 
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? (
