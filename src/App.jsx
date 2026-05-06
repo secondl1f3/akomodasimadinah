@@ -10,12 +10,13 @@ import {
   AlertCircle,
   Loader2,
   ChevronDown,
-  Calendar
+  Calendar,
+  Hash
 } from "lucide-react";
 import "./App.css";
 import { kloterList } from "./kloterData";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVtlA6E1IychGjtKAuAAU7dU4NHE_i6rieV9CQdxhVnSsl4cX0wB8t2o74f9PPikK9/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYcXwsQP71wfvlCqeNVoyDz7ydfY8ncyaEMNRgvftKBbbVPUWg8f34ubV8kq-Xq203/exec";
 
 const hotelBySektor = {
   "Sektor 1": [
@@ -154,6 +155,7 @@ const hotelBySektor = {
 function App() {
   const [formData, setFormData] = useState({
     jenisFormulir: "",
+    hariKe: "",
     sektor: "",
     hotel: "",
     kloter: "",
@@ -164,7 +166,7 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
-  
+
   const [kloterSearch, setKloterSearch] = useState("");
   const [showKloterDropdown, setShowKloterDropdown] = useState(false);
   const kloterRef = useRef(null);
@@ -206,9 +208,9 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { jenisFormulir, sektor, hotel, kloter, jumlahJamaah, tanggal, jam } = formData;
+    const { jenisFormulir, hariKe, sektor, hotel, kloter, jumlahJamaah, tanggal, jam } = formData;
 
-    if (!jenisFormulir || !sektor || !hotel || !kloter || !jumlahJamaah || !tanggal || !jam) {
+    if (!jenisFormulir || !hariKe || !sektor || !hotel || !kloter || !jumlahJamaah || !tanggal || !jam) {
       showToast("Mohon lengkapi semua data form.", "error");
       return;
     }
@@ -227,6 +229,7 @@ function App() {
       showToast("Data berhasil dikirim!", "success");
       setFormData({
         jenisFormulir: "",
+        hariKe: "",
         sektor: "",
         hotel: "",
         kloter: "",
@@ -282,31 +285,16 @@ function App() {
               </div>
 
               <div className="field">
-                <label>Tanggal</label>
+                <label>Hari Ke</label>
                 <div className="input-wrapper">
-                  <Calendar className="field-icon" size={20} />
+                  <Hash className="field-icon" size={20} />
                   <input
-                    type="date"
-                    name="tanggal"
-                    value={formData.tanggal}
+                    type="number"
+                    name="hariKe"
+                    value={formData.hariKe}
                     onChange={handleChange}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  />
-                </div>
-              </div>
-
-              <div className="field">
-                <label>
-                  {formData.jenisFormulir === "Pendorongan" ? "Jam Check-out" : "Jam Check-in"}
-                </label>
-                <div className="input-wrapper">
-                  <Clock className="field-icon" size={20} />
-                  <input
-                    type="time"
-                    name="jam"
-                    value={formData.jam}
-                    onChange={handleChange}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                    placeholder="Masukkan hari ke"
+                    min="1"
                   />
                 </div>
               </div>
@@ -346,6 +334,36 @@ function App() {
                         ))}
                     </ul>
                   )}
+                </div>
+              </div>
+
+              <div className="field">
+                <label>Tanggal</label>
+                <div className="input-wrapper">
+                  <Calendar className="field-icon" size={20} />
+                  <input
+                    type="date"
+                    name="tanggal"
+                    value={formData.tanggal}
+                    onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
+              </div>
+
+              <div className="field">
+                <label>
+                  {formData.jenisFormulir === "Pendorongan" ? "Jam Check-out" : "Jam Check-in"}
+                </label>
+                <div className="input-wrapper">
+                  <Clock className="field-icon" size={20} />
+                  <input
+                    type="time"
+                    name="jam"
+                    value={formData.jam}
+                    onChange={handleChange}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
                 </div>
               </div>
 
